@@ -1,4 +1,4 @@
-function [temp_e, baseline] = events_processing(data, bwindow, ewindow, ithres, dthres)
+function [temp_e, baseline, ithres] = events_processing(data, bwindow, ewindow, dthres)
 %переписываем функцию для обработки событий
 %   для начала нужно понять, что подается на вход
 %   data: по строкам будут клетки, по столбцам интенсивности в
@@ -20,19 +20,21 @@ if nargin < 3 || isempty(ewindow)
         ewindow = defpar.ewindow;
 end
 
-if nargin < 4 || isempty(ithres)
+%if nargin < 4 || isempty(ithres)
 %         defpar = def_params;
 %         ithres = defpar.ithres;
-        ithres = intensity_filter(data(:));
+%       ithres = intensity_filter(data(:));
 
-end
+%end
 
-if nargin < 5 || isempty(dthres)
+if nargin < 4 || isempty(dthres)
         defpar = def_params;
         dthres = defpar.dthres;
 end
 
+%поиск порога
 baseline = baseline_search(data, bwindow);
+ithres = ithres_search(data, baseline);
 
 %посчитаем скользящее среднее, чтобы от него взять производную
 data_smoothed = smoothdata(data, 2, 'movmean', ewindow);
@@ -61,6 +63,7 @@ for ncell = 1:ncells
     end
 end
 
+ithres = ithres(:, 1);
 temp_e = temp_e(:, 2:end-1);
 end
 
@@ -75,6 +78,14 @@ function [moving_average] = baseline_search(data, window)
             moving_average(coordinates)=data(coordinates);
             moving_average = smoothdata(moving_average, 2, 'movmean', window);
         end
+end
+
+function ithres = ithres_search(data, baseline)
+    ithres = zeros(size(data));
+    ithres_matrix = data - baseline;
+    for ncell = 1:size(data, 1)
+        ithres(ncell, :) = intensity_filter_v2(ithres_matrix(ncell, :));
+    end
 end
 
 function temp_e = remove_short_events(temp_e, der_mask, ncell, sz)
@@ -149,5 +160,5 @@ function [temp_e, nl] = begins_marking(temp_e, coors, der, ncell, k)
             temp_e(ncell, l-4:l)= 1;
        end
     end
-    nl=l;
+    nl=l-5;
 end
