@@ -1,5 +1,5 @@
 # events_processing
-## An algorythm for the detection of calcium events in astrocytes
+## An algorithm for the detection of calcium events in astrocytes
 Состоит из нескольких функций: 
 
 	1. events_processing - основная функция для обработки данных.	
