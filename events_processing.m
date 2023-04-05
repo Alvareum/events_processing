@@ -41,7 +41,8 @@ function [temp_e, baseline, ithres, data_smoothed, der] = events_processing(data
 
     %поиск событий для матриц
     e_mask = data > baseline+ithres; % матрица с событиями
-    der = [0, 0, diff(data_smoothed, 1, 2)]; % производная для скольз среднего
+    nulls_der = zeros(size(data_smoothed, 1), 2);
+    der = [nulls_der, diff(data_smoothed, 1, 2)]; % производная для скольз среднего
 
     %отсекаем короткие события
     nulls = zeros(length(e_mask(:, 1)), 1);
@@ -105,7 +106,7 @@ function [temp_e] = gap_less_ten(temp_e, coors, der, ncell, k, dthres)
     der_b = der;
     [temp_e, nl] = begins_marking(temp_e, coors, der_b, ncell, k);
     nl = nl - 2;
-    der_e = der(2:end);
+    der_e = der(:, 2:end);
     for l = coors(k):nl %итерируемся по возрастающей
         if l+4 > length(der_e(1, :))
             break
@@ -140,7 +141,7 @@ function [temp_e] = gap_greater_ten(temp_e, coors, der, ncell, k, dthres)
     %der_b = [0, der];
     der_b = der;
     [temp_e, nl] = begins_marking(temp_e, coors, der_b, ncell, k);
-    der_e = der(2:end);
+    der_e = der(:, 2:end);
     %der_l = der;
     for l=coors(k):nl-6 %coors(k+1)%nl-4
         if l+4 > length(der_e(1, :))
