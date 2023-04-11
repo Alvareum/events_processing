@@ -1,7 +1,7 @@
 function ithres = intensity_filter_v2(maxall)
     tmp1 = maxall;
     tmp1 = tmp1(tmp1 > 1/2^8); %%% above 0 in terms of single precision %%%
-    if ~isempty(tmp1)
+    if length(tmp1) > 1 %~isempty(tmp1)
         tmp1 = sort(tmp1);
         tmp2 = linspace(tmp1(1), 1 * tmp1(end), length(tmp1));
         tmp = tmp1(:) - 0.2 * tmp2(:);
@@ -21,6 +21,6 @@ function ithres = intensity_filter_v2(maxall)
         end
                 
     else
-        ithres = 0;
+        ithres = Inf;
     end
 end

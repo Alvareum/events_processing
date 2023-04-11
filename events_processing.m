@@ -82,6 +82,7 @@ function [moving_average] = baseline_search(data, window)
         moving_average(coordinates)=data(coordinates);
         moving_average = smoothdata(moving_average, 2, 'sgolay', window);
     end
+    moving_average = max(0, moving_average);
 end
 
 function ithres = ithres_search(data, baseline)
