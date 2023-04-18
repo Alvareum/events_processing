@@ -64,6 +64,7 @@ function [temp_e, baseline, ithres, data_smoothed, der] = events_processing(data
                 temp_e = gap_greater_ten(temp_e, coors, der, ncell, k, dthres);
             end
         end
+        temp_e(ncell, :) = rmv_boundary_events(temp_e(ncell, :));
     end
 
     ithres = ithres(:, 1);
@@ -189,4 +190,17 @@ function [temp_e, nl] = begins_marking(temp_e, coors, der, ncell, k)
         end
     end
 
+end
+
+function temp_e = rmv_boundary_events(temp_e)
+        event_beg = find(temp_e > 0, 1);
+        event_end = find(temp_e > 0, 1, "last");
+        if event_beg == 1
+            event_beg_2 = find(temp_e == 0, 1);
+            temp_e(event_beg:event_beg_2) = 0;
+        end
+        if event_end == size(temp_e, 2)
+            event_end_2 = find(temp_e == 0, 1, "last");
+            temp_e(event_end_2:event_end) = 0;
+        end
 end
