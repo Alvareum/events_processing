@@ -17,7 +17,9 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         bin_period = min_intensity:bin_size:max_intensity;
         [counts, centers] = hist(double(pixels_intensity), 500);
         figname = sprintf("cell_%d_intensity_matrix", ncell);
-        path_to_save = fullfile(foldername, figname);
+        filename = figname + ".mat";
+        path_to_save_1 = fullfile(foldername, figname);
+        path_to_save_2 = fullfile(foldername, filename);
         f = figure(1);
         imagesc(counts(:, 1:300));
         ax = gca;
@@ -25,9 +27,9 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         colormap(gca, 'jet');
         f.Units = 'inches';
         f.OuterPosition = [0.25 0.25 16 6];
-        print(gcf, path_to_save, '-dpng');
+        print(gcf, path_to_save_1, '-dpng');
         clf
-        save(path_to_save,"counts", "bin_period", "centers", '-mat');
+        save(path_to_save_2,"counts", "bin_period", "centers", '-mat');
         ks_array = zeros(length(centers), size(pixels_intensity, 2));
         for i=1:size(pixels_intensity, 2)
             x = ksdensity(double(pixels_intensity(:, i)), centers);
@@ -37,11 +39,13 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         ks_array_max_col = max(ks_array, [], 1);
         ks_array_normalised = ks_array ./ ks_array_max_col;
         figname = sprintf("cell_%d_ks_array", ncell);
-        path_to_save = fullfile(foldername, figname);
+        filename = figname + ".mat";
+        path_to_save_1 = fullfile(foldername, figname);
+        path_to_save_2 = fullfile(foldername, filename);
         f = figure(6);
         tiledlayout(2,1)
         nexttile
-        imagesc(ks_array_normalised(:, 1:300));
+        imagesc(1:300, centers(:, 1), ks_array_normalised(:, 1:300));
         ax = gca;
         ax.YDir = 'normal';
         colormap(gca, 'jet');
@@ -59,9 +63,9 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         xlim([0, 300]);
         legend();
         hold off;
-        print(gcf, path_to_save, '-r300', '-dpng');
+        print(gcf, path_to_save_1, '-r300', '-dpng');
         clf;
-        save(path_to_save,"ks_array", 'ks_array_normalised', '-mat');
+        save(path_to_save_2+"mat","ks_array", 'ks_array_normalised', '-mat');
     end
 
 
