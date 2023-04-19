@@ -1,0 +1,18 @@
+cd("C:\Users\foxy3\OneDrive\Документы\MATLAB\min1pipe_data") 
+data = dir('*calculus*');
+
+for video=43:43%length(data)
+    path = fullfile(data(video).folder, data(video).name);
+    videoname = "source_video_data_processed";
+    file_path = fullfile(path, videoname);
+    load(file_path, 'sigfn');
+    video_duration = size(sigfn, 2);
+    %sigfn_interp = interp1(1:video_duration, sigfn.', 0.05:0.05:video_duration, "next").';
+    [events, baseline, ithres, data_smoothed, der] = events_processing(sigfn, 20, 5);
+    results = struct('events',events, 'baseline', baseline, 'ithres', ...
+        ithres, 'data_smoothed', data_smoothed, 'der', der, 'neurodata', sigfn);
+    dt = preparing_events_data(results.events);
+    cd(path)
+    save('results_v2_4.mat', "results");
+    writetable(dt, 'result_table_v2_4.csv');
+end
