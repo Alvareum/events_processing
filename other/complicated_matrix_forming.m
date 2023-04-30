@@ -9,6 +9,9 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
     foldername = "intensity_matrix_v4";
     mkdir(foldername);
     for ncell=1:ncells
+%         if sum(roifn_1(:, :, ncell), 'all') == 0
+%             continue
+%         end
         pixels = find(roifn_1(:, :, ncell));
         pixels_intensity = source_video_reshaped(pixels, :);
         max_intensity = max(pixels_intensity, [], "all");
@@ -29,7 +32,7 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         f.OuterPosition = [0.25 0.25 16 6];
         print(gcf, path_to_save_1, '-dpng');
         clf
-        save(path_to_save_2,"counts", "bin_period", "centers", '-mat');
+        save(path_to_save_2,"counts", "bin_period", "centers");
         ks_array = zeros(length(centers), size(pixels_intensity, 2));
         for i=1:size(pixels_intensity, 2)
             x = ksdensity(double(pixels_intensity(:, i)), centers);
@@ -65,7 +68,7 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         hold off;
         print(gcf, path_to_save_1, '-r300', '-dpng');
         clf;
-        save(path_to_save_2+"mat","ks_array", 'ks_array_normalised', '-mat');
+        save(path_to_save_2,"ks_array", 'ks_array_normalised');
     end
 
 

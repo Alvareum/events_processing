@@ -12,10 +12,10 @@ for video=1:length(data)
     [events, baseline, ithres, data_smoothed, der] = events_processing(sigfn, 20, 5);
     results = struct('events',events, 'baseline', baseline, 'ithres', ...
         ithres, 'data_smoothed', data_smoothed, 'der', der, 'neurodata', sigfn);
-    dt = preparing_events_data(results.events);
+    dt = preparing_events_data(results.events, sigfn);
     cd(path)
     save('results_video.mat', "results");
-    writetable(dt, 'dt_video.csv');
+    writetable(dt, 'dt_video_v2.csv');
 end
 
 groups = ["30", "53", "hyp", "int"];
@@ -26,4 +26,4 @@ for i=1:length(groups)
 end
 
 cd(project_path);
-writetable(group_dt, "group_dt.csv");
+writetable(group_dt, "group_dt_v2.csv");

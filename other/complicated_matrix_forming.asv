@@ -29,7 +29,7 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         f.OuterPosition = [0.25 0.25 16 6];
         print(gcf, path_to_save_1, '-dpng');
         clf
-        save(path_to_save,"counts", "bin_period", "centers", '-mat');
+        save(path_to_save_2,"counts", "bin_period", "centers", '-mat');
         ks_array = zeros(length(centers), size(pixels_intensity, 2));
         for i=1:size(pixels_intensity, 2)
             x = ksdensity(double(pixels_intensity(:, i)), centers);
@@ -39,7 +39,8 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         ks_array_max_col = max(ks_array, [], 1);
         ks_array_normalised = ks_array ./ ks_array_max_col;
         figname = sprintf("cell_%d_ks_array", ncell);
-        path_to_save = fullfile(foldername, figname);
+        path_to_save_1 = fullfile(foldername, figname);
+        path_to_save_ = fullfile(foldername, figname);
         f = figure(6);
         tiledlayout(2,1)
         nexttile
@@ -61,7 +62,7 @@ function complicated_matrix_forming(source_video, roifn, wmeans, sigfn)
         xlim([0, 300]);
         legend();
         hold off;
-        print(gcf, path_to_save, '-r300', '-dpng');
+        print(gcf, path_to_save_1, '-r300', '-dpng');
         clf;
         save(path_to_save+"mat","ks_array", 'ks_array_normalised', '-mat');
     end

@@ -90,7 +90,7 @@ function ithres = ithres_search(data, baseline)
     ithres = zeros(size(data));
     ithres_matrix = data - baseline;
     for ncell = 1:size(data, 1)
-        ithres(ncell, :) = intensity_filter_v2(ithres_matrix(ncell, :));
+        ithres(ncell, :) = intensity_filter_v2(ithres_matrix(ncell, 10:10:size(data, 2)));
     end
 end
 
