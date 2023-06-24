@@ -1,7 +1,8 @@
-cd("C:\Users\foxy3\OneDrive\Документы\MATLAB\min1pipe_data") 
+project_path = "C:\Users\foxy3\OneDrive\Документы\MATLAB\min1pipe_data";
+cd(project_path) ;
 data = dir('*calculus*');
 
-for video=43:43%length(data)
+for video=1:length(data)
     path = fullfile(data(video).folder, data(video).name);
     videoname = "source_video_data_processed";
     file_path = fullfile(path, videoname);
@@ -11,8 +12,51 @@ for video=43:43%length(data)
     [events, baseline, ithres, data_smoothed, der] = events_processing(sigfn, 20, 5);
     results = struct('events',events, 'baseline', baseline, 'ithres', ...
         ithres, 'data_smoothed', data_smoothed, 'der', der, 'neurodata', sigfn);
-    dt = preparing_events_data(results.events);
+    dt = preparing_events_data(results.events, sigfn);
     cd(path)
-    save('results_v2_4.mat', "results");
-    writetable(dt, 'result_table_v2_4.csv');
+    save('results_video.mat', "results");
+    writetable(dt, 'dt_video_v2.csv');
 end
+
+groups = ["30", "53", "hyp", "int"];
+group_dt = table();
+for i=1:length(groups)
+    dt = process_group_data(groups(i));
+    group_dt = cat(1, group_dt, dt);
+end
+
+cd(project_path);
+writetable(group_dt, "group_dt_v2.csv");
+%%
+project_path = "E:\practice\lab_data\results";
+cd(project_path) ;
+data = dir('*calculus*');
+for video=1:length(data)
+    fprintf("processing video %s \n", data(video).name);
+    tic;
+    path = fullfile(data(video).folder, data(video).name);
+    videoname = "results_smoothed_video.mat";
+    file_path = fullfile(path, videoname);
+    load(file_path);
+    video_duration = size(results.neurodata, 2);
+    %sigfn_interp = interp1(1:video_duration, sigfn.', 0.05:0.05:video_duration, "next").';
+    [events, baseline, ithres, data_smoothed, der] = events_processing(results.neurodata, 2000, 5);
+    results_v2 = struct('events',events, 'baseline', baseline, 'ithres', ...
+        ithres, 'data_smoothed', data_smoothed, 'der', der, 'neurodata', results.neurodata);
+    dt = preparing_events_data(results_v2.events, results_v2.neurodata, results_v2.baseline);
+    cd(path)
+    % версии см в logseq что показать на встрече 05.05
+    save('results_video_v2.mat', "results_v2");
+    writetable(dt, 'dt_video_v2.csv');
+    toc;
+end
+%%
+groups = ["30", "53", "hyp", "int"];
+group_dt = table();
+for i=1:length(groups)
+    dt = process_group_data(groups(i));
+    group_dt = cat(1, group_dt, dt);
+end
+
+cd(project_path);
+writetable(group_dt, "group_dt.csv");

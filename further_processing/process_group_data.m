@@ -2,7 +2,7 @@ function group_dt = process_group_data(group)
 %PROCESS_GROUP_DATA Summary of this function goes here
 %   Detailed explanation goes here
 % group - *53*, *30*, *hyp*, *int*
-path = "C:\Users\foxy3\OneDrive\Документы\MATLAB\min1pipe_data";
+path = "E:\practice\lab_data\results";
 cd(path);
 chosen_group = sprintf("*calculus_%s*", group);
 data = dir(chosen_group);
@@ -20,7 +20,7 @@ group_list = strings(1, length(data));
 group_list(:) = group;
 for i = 1:length(data)
     tablename = fullfile(data(i).folder, data(i).name);
-    tablename = fullfile(tablename, "dt_video_v2.csv");
+    tablename = fullfile(tablename, "dt_video_v5.csv");
     dt = readtable(tablename);
     mean_events_number(i) = mean(dt.events_numbers, 'omitnan');
     median_events_number(i) = median(dt.events_numbers, 'omitnan');

@@ -4,7 +4,7 @@ function ithres = intensity_filter_v2(maxall)
     if length(tmp1) > 1 %~isempty(tmp1)
         tmp1 = sort(tmp1);
         tmp2 = linspace(tmp1(1), 1 * tmp1(end), length(tmp1));
-        tmp = tmp1(:) - 0.2 * tmp2(:);
+        tmp = tmp1(:) - 0.3 * tmp2(:);
         x = 1: length(tmp);
         sker = 2 * round(length(tmp) / 100) + 1;
         xq = [1 - sker: 0, x, length(tmp) + 1: length(tmp) + sker];

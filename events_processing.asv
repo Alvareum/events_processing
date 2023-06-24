@@ -1,6 +1,4 @@
 function [temp_e, baseline, ithres, data_smoothed, der] = events_processing(data, bwindow, ewindow, dthres)
-    %переписываем функцию для обработки событий
-    %   для начала нужно понять, что подается на вход
     %   data: по строкам будут клетки, по столбцам интенсивности в
     %   момент времени
     %   bwindow = окно для базовой линии
@@ -19,20 +17,22 @@ function [temp_e, baseline, ithres, data_smoothed, der] = events_processing(data
         defpar = def_params;
         ewindow = defpar.ewindow;
     end
+%     baseline = baseline_search(data, bwindow);
+%     if nargin < 4 || isempty(ithres)
+%             defpar = def_params;
+%             ithres = defpar.ithres;
+%           ithres = intensity_filter(data(:));
 
-    %if nargin < 4 || isempty(ithres)
-    %         defpar = def_params;
-    %         ithres = defpar.ithres;
-    %       ithres = intensity_filter(data(:));
+%             ithres = ithres_search(data, baseline);
 
-    %end
+%     end
 
     if nargin < 4 || isempty(dthres)
         defpar = def_params;
         dthres = defpar.dthres;
     end
 
-    %поиск порога
+%     поиск порога
     baseline = baseline_search(data, bwindow);
     ithres = ithres_search(data, baseline);
 
@@ -40,7 +40,12 @@ function [temp_e, baseline, ithres, data_smoothed, der] = events_processing(data
     data_smoothed = smoothdata(data, 2, 'sgolay', ewindow);
 
     %поиск событий для матриц
-    e_mask = data > baseline+ithres; % матрица с событиями
+    e_mask = zeros(size(data));
+%     for n=1:length(spread_intensity)
+%         numcells = spread_intensity{n};
+%         e_mask(numcells, :) = data(numcells, :) > baseline(numcells, :) + ithres(n);
+%     end
+    e_mask = data > baseline+ithres.'; % матрица с событиями
     nulls_der = zeros(size(data_smoothed, 1), 2);
     der = [nulls_der, diff(data_smoothed, 1, 2)]; % производная для скольз среднего
 
@@ -67,7 +72,8 @@ function [temp_e, baseline, ithres, data_smoothed, der] = events_processing(data
         temp_e(ncell, :) = rmv_boundary_events(temp_e(ncell, :));
     end
 
-    ithres = ithres(:, 1);
+    %ithres = ithres(:, 1);
+    ithres = ithres.';
     temp_e = temp_e(:, 2:end-1);
     der = der(:, 2:end);
 end
@@ -87,11 +93,34 @@ function [moving_average] = baseline_search(data, window)
 end
 
 function ithres = ithres_search(data, baseline)
-    ithres = zeros(size(data));
+    %ithres = zeros(size(data));
     ithres_matrix = data - baseline;
-    for ncell = 1:size(data, 1)
-        ithres(ncell, :) = intensity_filter_v2(ithres_matrix(ncell, 10:10:size(data, 2)));
+    ncells = size(baseline, 1);
+    means = mean(baseline, 2).';
+    min_mean = min(means);
+    max_mean = max(means);
+    span_mean = max_mean - min_mean;
+    n_ints = 50;
+    size_ints = span_mean / n_ints;
+    spread_mean = min_mean:size_ints:max_mean;
+    ithres_1 = zeros(1, ncells);
+    ithres_2 = zeros(1, ncells);
+    ithres_3 = ones(1, ncells);
+    spread_intensity = cell(1, n_ints);
+    for j = 2:n_ints+1
+        if j == n_ints+1
+           number_cells = find(means > spread_mean(j-1) & means <= spread_mean(j));
+        else
+            number_cells = find(means >= spread_mean(j-1) & means < spread_mean(j));
+        end
+        spread_intensity{1, j-1} = number_cells;
+        ithres_1(number_cells) = intensity_filter_v2(ithres_matrix(number_cells, 10:10:size(data, 2)));
     end
+    for ncell = 1:size(data, 1)
+        ithres_2(ncell) = intensity_filter_v2(ithres_matrix(ncell, 10:10:size(data, 2)));
+    end
+    ithres = max(ithres_1, ithres_2);
+    ithres = max(ithres, ithres_3);
 end
 
 function temp_e = remove_short_events(temp_e, der_mask, ncell, sz)
