@@ -68,7 +68,10 @@ end
 
 function [moving_average] = baseline_search(data, window)
     if nargin < 2
-        window = 20 * 4;
+        window = 20 * 4+1;
+    end
+    if mod(window, 2) == 0
+        window = window + 1;
     end
     moving_average = smoothdata(data, 2, 'movmean', window);
     for j=1:9
@@ -92,7 +95,7 @@ function ithres = ithres_search(data, baseline)
     spread_mean = min_mean:size_ints:max_mean;
     ithres_1 = zeros(1, ncells);
     ithres_2 = zeros(1, ncells);
-    ithres_3 = ones(1, ncells);
+    ithres_3 = zeros(1, ncells); %ones(1, ncells);
     spread_intensity = cell(1, n_ints);
     for j = 2:n_ints+1
         if j == n_ints+1

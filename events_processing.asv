@@ -17,15 +17,6 @@ function [temp_e, baseline, ithres, data_smoothed, der] = events_processing(data
         defpar = def_params;
         ewindow = defpar.ewindow;
     end
-%     baseline = baseline_search(data, bwindow);
-%     if nargin < 4 || isempty(ithres)
-%             defpar = def_params;
-%             ithres = defpar.ithres;
-%           ithres = intensity_filter(data(:));
-
-%             ithres = ithres_search(data, baseline);
-
-%     end
 
     if nargin < 4 || isempty(dthres)
         defpar = def_params;
@@ -41,10 +32,6 @@ function [temp_e, baseline, ithres, data_smoothed, der] = events_processing(data
 
     %поиск событий для матриц
     e_mask = zeros(size(data));
-%     for n=1:length(spread_intensity)
-%         numcells = spread_intensity{n};
-%         e_mask(numcells, :) = data(numcells, :) > baseline(numcells, :) + ithres(n);
-%     end
     e_mask = data > baseline+ithres.'; % матрица с событиями
     nulls_der = zeros(size(data_smoothed, 1), 2);
     der = [nulls_der, diff(data_smoothed, 1, 2)]; % производная для скольз среднего
